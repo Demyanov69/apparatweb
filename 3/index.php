@@ -64,12 +64,12 @@ if (empty($_POST['email'])) {
 }
 
 // Валидация даты рождения (простая проверка, можно улучшить)
-$birthdate = null; // Initialize to null
+$birthdate = null; 
 if (!empty($_POST['birthdate'])) {
     $birthdate = trim($_POST['birthdate']);
     try {
         $birthdate_obj = new DateTime($birthdate);
-        $birthdate = $birthdate_obj->format('Y-m-d'); // Format for database
+        $birthdate = $birthdate_obj->format('Y-m-d'); 
     } catch (Exception $e) {
         print('Некорректная дата рождения.<br/>');
         $errors = TRUE;
@@ -91,31 +91,29 @@ if (empty($_POST['gender'])) {
 // Валидация языков программирования
 if (isset($_POST['languages']) && is_array($_POST['languages'])) {
     $languages = $_POST['languages'];
-        // Получаем ID языков из базы данных
-        $placeholders = implode(',', array_fill(0, count($languages), '?')); // Создаем строку плейсхолдеров (?, ?, ?)
+        $placeholders = implode(',', array_fill(0, count($languages), '?')); 
         $stmt = $db->prepare("SELECT id FROM languages WHERE name IN ($placeholders)");
-        $stmt->execute($languages);  // Передаем массив языков для подстановки
-        $language_ids = $stmt->fetchAll(PDO::FETCH_COLUMN, 0); // Получаем только ID
+        $stmt->execute($languages);  
+        $language_ids = $stmt->fetchAll(PDO::FETCH_COLUMN, 0); 
     
-        // Проверяем, все ли языки найдены
         if (count($language_ids) !== count($languages)) {
             print('Один или несколько языков программирования не найдены в базе данных.<br/>');
             $errors = TRUE;
         }
     } else {
-        $languages = []; // Если ничего не выбрано
+        $languages = []; 
         $language_ids = [];
     }
     
     // Валидация биографии
-    $bio = isset($_POST['bio']) ? trim($_POST['bio']) : ''; // Может быть пустым
+    $bio = isset($_POST['bio']) ? trim($_POST['bio']) : ''; 
     
     // Валидация соглашения
     if (empty($_POST['agreement'])) {
         print('Необходимо согласие с контрактом.<br/>');
         $errors = TRUE;
     } else {
-        $agreement = ($_POST['agreement'] == 'on') ? 1 : 0; // Преобразуем в 1 или 0
+        $agreement = ($_POST['agreement'] == 'on') ? 1 : 0; 
     }
     
     
@@ -124,14 +122,11 @@ if (isset($_POST['languages']) && is_array($_POST['languages'])) {
     }
     
     try {
-        // 1. Вставляем данные в таблицу applications
         $stmt = $db->prepare("INSERT INTO applications (fio, phone, email, birthdate, gender, bio, agreement) VALUES (?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([$fio, $phone, $email, $birthdate, $gender, $bio, $agreement]);
     
-        // Получаем ID последней вставленной записи
         $application_id = $db->lastInsertId();
     
-        // 2. Вставляем данные в таблицу application_languages
         $stmt = $db->prepare("INSERT INTO application_languages (application_id, language_id) VALUES (?, ?)");
         foreach ($language_ids as $lang_id) {
             $stmt->execute([$application_id, $lang_id]);
