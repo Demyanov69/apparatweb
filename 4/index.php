@@ -1,7 +1,7 @@
 <?php
 header('Content-Type: text/html; charset=UTF-8');
 
-// Конфигурация базы данных (замените на свои значения)
+// Конфигурация базы данных 
 $db_host = 'localhost';
 $db_name = 'u68761';
 $db_user = 'u68761';
@@ -18,7 +18,6 @@ try {
     die("Ошибка подключения к базе данных: " . $e->getMessage());
 }
 
-// Функция для очистки Cookies
 function clearCookies()
 {
     $cookie_names = [
@@ -47,7 +46,7 @@ function clearCookies()
         }
     }
 }
-// Инициализация переменных для передачи в форму
+
 $messages = array();
 $errors = array();
 $values = array();
@@ -62,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         $messages[] = 'Спасибо, результаты сохранены.';
     }
 
-    $errors['fio'] = $_COOKIE['fio_error'] ?? ''; // Сохраняем текст ошибки
+    $errors['fio'] = $_COOKIE['fio_error'] ?? ''; 
     $errors['phone'] = $_COOKIE['phone_error'] ?? '';
     $errors['email'] = $_COOKIE['email_error'] ?? '';
     $errors['birthdate'] = $_COOKIE['birthdate_error'] ?? '';
@@ -80,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     $values['bio'] = $_COOKIE['bio_value'] ?? '';
     $values['agreement'] = $_COOKIE['agreement_value'] ?? '';
 
-    clearCookies(); // Очищаем куки после отображения формы с ошибками
+    clearCookies(); 
     include('form.php');
 
     exit();
@@ -164,7 +163,7 @@ if (empty($_POST['agreement'])) {
 }
 
 // Сохранение значений в Cookies
-$cookie_expiry_session = time() + 3600; //  на сессию
+$cookie_expiry_session = time() + 3600; 
 setcookie('fio_value', $fio, $cookie_expiry_session, '/');
 setcookie('phone_value', $phone, $cookie_expiry_session, '/');
 setcookie('email_value', $email, $cookie_expiry_session, '/');
@@ -179,7 +178,6 @@ if (isset($agreement)) {
 }
 
 if (!empty($errors)) {
-    // Сохраняем ошибки в Cookies
     foreach ($errors as $key => $error) {
         setcookie($key . '_error', $error, $cookie_expiry_session, '/');
     }
